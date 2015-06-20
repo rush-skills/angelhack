@@ -7,12 +7,27 @@ import sys
 
 from thread import *
 HOST = ''   # Symbolic name, meaning all available interfaces
-PORT = 8888 # Arbitrary non-privileged port
+PORT = 8887 # Arbitrary non-privileged port
+events = (
+        uinput.REL_X,
+        uinput.REL_Y,
+        uinput.BTN_LEFT,
+        uinput.BTN_RIGHT,
+        uinput.KEY_W,
+        uinput.KEY_A,
+        uinput.KEY_S,
+        uinput.KEY_D,
+        uinput.KEY_J,
+        uinput.KEY_K,
+        uinput.KEY_H,
+        uinput.KEY_F
+        )
 
 #Function for handling connections. This will be used to create threads
 def clientthread(conn):
     #Sending message to connected client
     conn.send('Welcome to the server. Type something and hit enter\n') #send only takes string
+    device =  uinput.Device(events)
 
     #infinite loop so that function do not terminate and thread do not end.
     while True:
@@ -20,6 +35,10 @@ def clientthread(conn):
         #Receiving from client
         data = conn.recv(1024)
         print data
+        data = data[-1]
+        eval('device.emit(uinput.KEY_%s,1)' % data.upper())
+        time.sleep(1)
+        eval('device.emit(uinput.KEY_%s,0)' % data.upper())
         reply = 'OK...' + data
         if not data:
             break
@@ -31,20 +50,6 @@ def clientthread(conn):
     conn.close()
 
 def main():
-    events = (
-        uinput.REL_X,
-        uinput.REL_Y,
-        uinput.BTN_LEFT,
-        uinput.BTN_RIGHT,
-        uinput.KEY_W,
-        uinput.KEY_A,
-        uinput.KEY_S,
-        uinput.KEY_D,
-        uinput.KEY_J,
-        uinput.KEY_K
-        )
-
-    device =  uinput.Device(events)
     # for i in range(20):
     #     # syn=False to emit an "atomic" (5, 5) event.
     #     device.emit(uinput.REL_X, 5, syn=False)
@@ -53,7 +58,7 @@ def main():
     #     # application, this is of course unnecessary.
     #     time.sleep(0.01)
 
-    time.sleep(2)
+    # time.sleep(2)
     # device.emit_click(uinput.KEY_H)
     # device.emit_click(uinput.KEY_E)
     # device.emit_click(uinput.KEY_L)
