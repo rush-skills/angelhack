@@ -217,9 +217,13 @@ def main():
     #now keep talking with the client
     while 1:
         #wait to accept a connection - blocking call
-        conn, addr = s.accept()
-        print 'Connected with ' + addr[0] + ':' + str(addr[1])
-        start_new_thread(clientthread ,(conn,))
+        try:
+            conn, addr = s.accept()
+            print 'Connected with ' + addr[0] + ':' + str(addr[1])
+            start_new_thread(clientthread ,(conn,))
+        except KeyboardInterrupt:
+            print "Closing Server"
+            break;
 
     s.close()
 
